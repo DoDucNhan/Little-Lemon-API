@@ -27,7 +27,6 @@ class CartSerializer(serializers.ModelSerializer):
         default=serializers.CurrentUserDefault()
     )
 
-
     def validate(self, attrs):
         attrs['price'] = attrs['quantity'] * attrs['unit_price']
         return attrs
@@ -47,7 +46,6 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
-
     orderitem = OrderItemSerializer(many=True, read_only=True, source='order')
 
     class Meta:
@@ -60,3 +58,43 @@ class UserSerilializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id','username','email']
+        
+
+class ManagerListSerializer(serializers.ModelSerializer):
+    class Meta():
+        model = User
+        fields = ['id','username','email']
+        
+        
+class CartAddSerializer(serializers.ModelSerializer):
+    class Meta():
+        model = Cart
+        fields = ['menuitem','quantity']
+        extra_kwargs = {
+            'quantity': {'min_value': 1},
+        }
+        
+        
+class CartRemoveSerializer(serializers.ModelSerializer):
+    class Meta():
+        model = Cart
+        fields = ['menuitem']
+        
+
+class SingleHelperSerializer(serializers.ModelSerializer):
+    class Meta():
+        model = MenuItem
+        fields = ['title','price']
+
+
+class SingleOrderSerializer(serializers.ModelSerializer):
+    menuitem = SingleHelperSerializer()
+    class Meta():
+        model = OrderItem
+        fields = ['menuitem','quantity']
+        
+
+class OrderInsertSerializer(serializers.ModelSerializer):
+    class Meta():
+        model = Order
+        fields = ['delivery_crew']
